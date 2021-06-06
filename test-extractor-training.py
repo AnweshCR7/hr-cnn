@@ -86,7 +86,8 @@ def train(model_to_train, optimizer, training_epoch):
     train_aes = []
     for batch_idx, (data, target) in enumerate(train_loader):
         if cuda:
-            data, target = data.cuda(async=True), target.cuda(async=True)
+            data = data.to('cuda')
+            target = target.to('cuda')
         data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
         output = model_to_train(data)
@@ -122,7 +123,7 @@ def validate(model_to_validate, training_epoch):
     validation_losses = []
     for batch_idx, (data, target) in enumerate(validation_loader):
         if cuda:
-            data, target = data.cuda(async=True), target.cuda(async=True)
+            data, target = data.to('cuda'), target.to('cuda')
         with torch.no_grad():
             data, target = Variable(data), Variable(target)
             output = model_to_validate(data)

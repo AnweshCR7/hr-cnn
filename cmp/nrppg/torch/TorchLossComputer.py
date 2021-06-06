@@ -11,9 +11,9 @@ class TorchLossComputer(object):
         two_pi_n_over_N = Variable(2 * math.pi * torch.arange(0, N, dtype=torch.float), requires_grad=True) / N
         hanning = Variable(torch.from_numpy(np.hanning(N)).type(torch.FloatTensor), requires_grad=True).view(1, -1)
         if cuda:
-            k = k.type(torch.FloatTensor).cuda(async=True)
-            two_pi_n_over_N = two_pi_n_over_N.cuda(async=True)
-            hanning = hanning.cuda(async=True)
+            k = k.type(torch.FloatTensor).to('cuda')
+            two_pi_n_over_N = two_pi_n_over_N.to('cuda')
+            hanning = hanning.to('cuda')
         output = output.view(1, -1) * hanning
         output = output.view(1, 1, -1).type(torch.cuda.FloatTensor)
         k = k.view(1, -1, 1)
@@ -125,8 +125,8 @@ class TorchLossComputer(object):
         arg_max_hr = 60.0 * f_max
 
         if cuda:
-            hr_range = Variable((torch.arange(low, high) / points_per_hz) + likelihoods_beginning_f).cuda(async=True)
-            arg_max_hr = Variable(torch.FloatTensor([arg_max_hr])).cuda(async=True)
+            hr_range = Variable((torch.arange(low, high) / points_per_hz) + likelihoods_beginning_f).to('cuda')
+            arg_max_hr = Variable(torch.FloatTensor([arg_max_hr])).to('cuda')
         else:
             hr_range = (np.arange(low, high) / points_per_hz) + likelihoods_beginning_f
 
@@ -168,7 +168,7 @@ class TorchLossComputer(object):
         target = target.view(1, -1)
         bpm_range = torch.arange(40, 240, dtype=torch.double)
         if cuda:
-            bpm_range = bpm_range.cuda(async=True)
+            bpm_range = bpm_range.to('cuda')
 
         hr_target = Variable((torch.median(target).data * 60.0) -bpm_range[0]).type(torch.FloatTensor)
         complex_absolute = TorchLossComputer.complex_absolute(input, Fs, bpm_range, cuda)
@@ -177,7 +177,7 @@ class TorchLossComputer(object):
         whole_max_idx = whole_max_idx.type(torch.float)
 
         if cuda:
-            hr_target = hr_target.cuda(async=True)
+            hr_target = hr_target.to('cuda')
 
         regularization_factor = (1.0 / regularization_factor)
         return regularization_factor * F.cross_entropy(complex_absolute, hr_target.view((1)).type(torch.long)).view(1), \
@@ -224,9 +224,9 @@ class TorchLossComputer(object):
         arg_whole_max_hr = Variable(torch.FloatTensor([arg_whole_max_hr]))
 
         if cuda:
-            weights = Variable(weights).cuda(async=True)
-            hr_gt = hr_gt.cuda(async=True).view(1)
-            arg_whole_max_hr = arg_whole_max_hr.cuda(async=True).view(1)
+            weights = Variable(weights).to('cuda')
+            hr_gt = hr_gt.to('cuda').view(1)
+            arg_whole_max_hr = arg_whole_max_hr.to('cuda').view(1)
 
         score = - (weights[low:high].view(-1) * lsm).sum()
         if posteriors is not None:

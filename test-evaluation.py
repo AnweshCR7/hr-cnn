@@ -123,6 +123,6 @@ if __name__ == "__main__":
     models_dir = os.path.join(hr_directory, 'models')
 
     dataset = Dataset.ECG_FITNESS
-    batch_size = 600
+    batch_size = 1
 
     perform_experiments(dataset, 'test')

@@ -247,7 +247,7 @@ def main(extractor_model, rgb, job_id, jobs, user_input=None):
             with torch.no_grad():
                 data, target = Variable(data), Variable(target)
                 if args['--use-gpu'] == 'True' and args['--enable-cuda'] == 'True':
-                    data, target = data.cuda(async=True), target.cuda(async=True)
+                    data, target = data.to('cuda'), target.to('cuda')
                 batch_output = extractor_model(data)
             # print("[Batch %d] done..." % (batch_idx))
             if outputs is None:
